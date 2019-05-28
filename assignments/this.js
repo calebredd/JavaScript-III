@@ -16,7 +16,7 @@ function addTwo(number) {
   console.log(this);
   return number + 2;
 }
-addTwo(3);
+//addTwo(3);
 // Principle 2
 
 // code example for Implicit Binding
@@ -31,7 +31,7 @@ person = {
     return;
   }
 };
-person.speak(person.said);
+//person.speak(person.said);
 
 // Principle 3
 
@@ -52,9 +52,9 @@ function NewPerson(name) {
 const danny = new NewPerson("Danny");
 const joni = new NewPerson("Joni");
 const jack = new NewPerson("Jack");
-console.log(danny.intro());
-console.log(joni.intro());
-console.log(jack.intro());
+//console.log(danny.intro());
+//console.log(joni.intro());
+//console.log(jack.intro());
 
 // Principle 4
 
@@ -82,4 +82,4 @@ function tellUsAboutYourself(thing1,thing2,thing3) {
     this.favoriteFood
   } but I am allergic to ${this.allergies}.`);
 }
-tellUsAboutYourself.call(yourObject, thingsYouEnjoy[2], thingsYouEnjoy[3], thingsYouEnjoy[0]);
+//tellUsAboutYourself.call(yourObject, thingsYouEnjoy[2], thingsYouEnjoy[3], thingsYouEnjoy[0]);
