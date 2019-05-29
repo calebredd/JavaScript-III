@@ -126,6 +126,9 @@ function Hero(attributes) {
     document.getElementById("roundResults").appendChild(node).innerHTML = `${
       this.name
     } was hit`;
+    console.log(`${
+      this.name
+      } was hit`);
     if (this.healthPoints <= 0) {
       return this.destroy();
     }
