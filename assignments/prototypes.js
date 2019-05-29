@@ -20,7 +20,6 @@ function GameObject(attributes) {
   this.name = attributes.name;
   this.dimensions = attributes.dimensions;
   this.destroy = function() {
-    alert(`${this.name} was removed from the game`);
     return console.log(`${this.name} was removed from the game`);
   };
 }
@@ -52,9 +51,26 @@ function Humanoid(attributes) {
   this.team = attributes.team;
   this.weapons = attributes.weapons;
   this.language = attributes.language;
+  this.race = attributes.race;
+  this.defense=attributes.defense;
+  this.attack=attributes.attack;
+  this.block=attributes.defense;
   this.greet = function() {
     return console.log(`${this.name} offers a greeting in ${this.language}`);
   };
+}
+
+function Hero(attributes) {
+  Humanoid.call(this, attributes);
+  this.special = attributes.special;
+  this.specialDescription = attributes.specialDescription;
+  this.will = 1;
+}
+
+function Villain(attributes) {
+  Humanoid.call(this, attributes);
+  this.master = attributes.master;
+  this.will = 3;
 }
 /*
  * Inheritance chain: GameObject -> CharacterStats -> Humanoid
@@ -64,285 +80,134 @@ function Humanoid(attributes) {
 
 // Test you work by un-commenting these 3 objects and the list of console logs below:
 
-const mage = new Humanoid({
+const axeman = new Hero({
   createdAt: new Date(),
   dimensions: {
-    length: 2,
-    width: 1,
+    length: 3,
+    width: 3,
     height: 1
   },
-  healthPoints: 5,
-  name: "Bruce",
-  team: "Mage Guild",
-  weapons: ["Staff of Shamalama"],
-  language: "Common Tongue"
+  healthPoints: 10,
+  name: "Gimli",
+  team: "the Mountain People",
+  weapons: ["Axe of Dragon Bone"],
+  language: "Dwarvish",
+  race: "dwarf",
+  attack:4,
+  defense:1,
+  specialDescription: "jump up and slam his axe down in a splitting force",
+  special: function(target) {
+    console.log(
+      `${axeman.name} leaped into the air with all his might and brought his ${
+        axeman.weapons
+      } crashing down onto ${target.name} causing critical damage`
+    );
+    return target.healthPoints-=axeman.attack;
+  }
 });
-const swordsman = new Humanoid({
+const swordsman = new Hero({
+  createdAt: new Date(),
+  dimensions: {
+    length: 1,
+    width: 2,
+    height: 3
+  },
+  healthPoints: 10,
+  name: "Aragon",
+  team: "Gondor",
+  weapons: ["Giant Sword", "Shield"],
+  language: "Common Tongue",
+  race: "human",
+  attack: 2,
+  defense: 3,
+  specialDescription: "slip through the shadows to be unseen by enemies",
+  special: function(target) {
+    console.log(
+      `${swordsman.name} has gone into the ShadowRealm and cannot be seen by ${
+        target.name
+      } for the next round`
+    );
+    swordsman.attack+=3;
+    swordsman.defense=10;
+  }
+});
+
+const archer = new Hero({
+  createdAt: new Date(),
+  dimensions: {
+    length: 1,
+    width: 1,
+    height: 3
+  },
+  healthPoints: 10,
+  name: "Legolas",
+  team: "the Forest Kingdom",
+  weapons: ["Bow", "Dagger"],
+  language: "Elvish",
+  race: "elf",
+  attack: 1,
+  defense: 4,
+  specialDescription:
+    "fire three arrows at once to temporarily immobolize an enemy",
+  special: function(target) {
+    console.log(
+      `${target.name} has been show by ${
+        archer.name
+      } with three arrows at once and is immobolized for the next round`
+    );
+    target.block = 0;
+    target.will=0;
+  }
+});
+const orc = new Villain({
   createdAt: new Date(),
   dimensions: {
     length: 2,
     width: 2,
     height: 2
   },
-  healthPoints: 15,
-  name: "Sir Mustachio",
-  team: "The Round Table",
-  weapons: ["Giant Sword", "Shield"],
-  language: "Common Tongue"
+  healthPoints: 30,
+  attack: 2,
+  defense: 3,
+  name: "Gahuul",
+  team: "the Black Hand",
+  weapons: ["Orc Blade", "Poison Arrow"],
+  language: "Orcish",
+  race: "orc",
+  master: "Sarumon"
 });
+const health = `HEALTH:\n${axeman.name}:${axeman.healthPoints}, ${swordsman.name}:${swordsman.healthPoints}, ${archer.name}:${archer.healthPoints}\n${orc.name}:${orc.healthPoints}`;
 
-const archer = new Humanoid({
-  createdAt: new Date(),
-  dimensions: {
-    length: 1,
-    width: 2,
-    height: 4
-  },
-  healthPoints: 10,
-  name: "Lilith",
-  team: "Forest Kingdom",
-  weapons: ["Bow", "Dagger"],
-  language: "Elvish"
-});
+console.log(
+  `${axeman.name} is a ${axeman.race} from ${axeman.team} who speaks ${
+    axeman.language
+  }, has a special ability to ${axeman.specialDescription} and wields ${
+    axeman.weapons
+  }`
+);
+console.log(
+  `${swordsman.name} is a ${swordsman.race} from ${swordsman.team} who speaks ${
+    swordsman.language
+  }, has a special ability to ${swordsman.specialDescription} and wields ${
+    swordsman.weapons
+  }`
+);
+console.log(
+  `${archer.name} is an ${archer.race} from ${archer.team} who speaks ${
+    archer.language
+  }, has a special ability to ${archer.specialDescription} and wields ${
+    archer.weapons
+  }`
+);
+console.log(
+  `${orc.name} is an ${orc.race} from ${orc.team} who speaks ${
+    orc.language
+  }, serves ${orc.master} and wields ${orc.weapons}`
+);
+console.log(health);
 
-console.log(mage.createdAt); // Today's date
-console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
-console.log(swordsman.healthPoints); // 15
-console.log(mage.name); // Bruce
-console.log(swordsman.team); // The Round Table
-console.log(mage.weapons); // Staff of Shamalama
-console.log(archer.language); // Elvish
-console.log(archer.greet()); // Lilith offers a greeting in Elvish.
-console.log(mage.takeDamage()); // Bruce took damage.
-console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
+mainloop=function(){
 
-// Stretch task:
-// * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.
-function Hero(attributes) {
-  Humanoid.call(this, attributes);
-  this.hit = function() {
-    this.healthPoints--;
-    let node = document.createElement("LI");
-    document.getElementById("roundResults").appendChild(node).innerHTML = `${
-      this.name
-    } was hit`;
-    if (this.healthPoints <= 0) {
-      return this.destroy();
-    }
-  };
-  this.heal = function() {
-    this.healthPoints++;
-    let node = document.createElement("LI");
-    return (document
-      .getElementById("roundResults")
-      .appendChild(node).innerHTML = `${this.name} recovered some health!`);
-  };
-}
-function Villain(attributes) {
-  Hero.call(this, attributes);
-}
-// * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
-
-// * Create two new objects, one a villain and one a hero and fight it out with methods!
-const darkLord = new Villain({
-  createdAt: new Date(),
-  dimensions: {
-    length: 1,
-    width: 2,
-    height: 4
-  },
-  healthPoints: 5,
-  name: "Dark Lord",
-  team: "Satan",
-  weapons: [
-    "Death, Plague, Pestilence, Fire&Brimstone, and his Mistress, EVE!!!"
-  ],
-  language: "Satanic"
-});
-const sabrina = new Hero({
-  createdAt: new Date(),
-  dimensions: {
-    length: 1,
-    width: 1,
-    height: 2
-  },
-  healthPoints: 5,
-  name: "Sabrina Spellman",
-  team: "Church of the Night",
-  weapons: ["Staff of Night"],
-  language: "English"
-});
-function darkloop() {
-  console.log(
-    `The hero of the story is ${
-      sabrina.name
-    }. She is a 16 year old girl with a secret....she is part of the ${
-      sabrina.team
-    }.`
-  );
-  console.log(
-    `Her arch nemesis is everybody's arch nemesis, Praise the ${
-      darkLord.name
-    }! \n They are going to battle it out!`
-  );
-  console.log(
-    `${sabrina.name} will be using ${sabrina.weapons}. \n The ${
-      darkLord.name
-    } will be using ${
-      darkLord.weapons
-    }.\n Let the games commence for the Church of the Night!`
-  );
-  console.log(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints} \n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  console.log(sabrina.hit()); //Hit
-  console.log(darkLord.hit()); //Heal
-  console.log(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints} \n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  console.log(sabrina.hit()); //Hit
-  console.log(sabrina.hit()); //Heal
-  console.log(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints} \n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  console.log(sabrina.hit()); //Hit
-  console.log(darkLord.hit()); //Heal
-  console.log(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints} \n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  console.log(sabrina.heal()); //Hit
-  console.log(sabrina.heal()); //Hit
-  console.log(sabrina.heal()); //Hit
-  console.log(darkLord.hit()); //Heal
-  console.log(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints} \n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  console.log(darkLord.heal()); //Heal
-  console.log(darkLord.hit()); //Heal
-  console.log(darkLord.hit()); //Heal
-  console.log(sabrina.hit()); //Hit
-  console.log(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints} \n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  console.log(sabrina.hit()); //Hit
-  console.log(darkLord.hit()); //Heal
-  console.log(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints} \n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  console.log(
-    `Way to go ${
-      sabrina.name
-    }! You saved Greendale/Riverdale,\n you can finally be a real girl now and take Salem for long walks in the park with Harvey and the gang!`
-  );
-  sabrina.healthPoints = 5;
-  darkLord.healthPoints = 5;
-  return;
-}
-function alertloop() {
-  alert(
-    `The hero of the story is ${
-      sabrina.name
-    }. She is a 16 year old girl with a secret....she is part of the ${
-      sabrina.team
-    }.`
-  );
-  alert(
-    `Her arch nemesis is everybody's arch nemesis, Praise the ${
-      darkLord.name
-    }! \nThey are going to battle it out!`
-  );
-  alert(
-    `${sabrina.name} will be using ${sabrina.weapons}. \n The ${
-      darkLord.name
-    } will be using ${
-      darkLord.weapons
-    }.\n Let the games commence for the Church of the Night!`
-  );
-  alert(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints}\n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  alert(sabrina.hit()); //Hit
-  alert(darkLord.hit()); //Heal
-  alert(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints}\n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  alert(sabrina.hit()); //Hit
-  alert(sabrina.hit()); //Heal
-  alert(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints}\n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  alert(sabrina.hit()); //Hit
-  alert(darkLord.hit()); //Heal
-  alert(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints}\n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  alert(sabrina.heal()); //Hit
-  alert(sabrina.heal()); //Hit
-  alert(sabrina.heal()); //Hit
-  alert(darkLord.hit()); //Heal
-  alert(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints}\n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  alert(darkLord.heal()); //Heal
-  alert(darkLord.hit()); //Heal
-  alert(darkLord.hit()); //Heal
-  alert(sabrina.hit()); //Hit
-  alert(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints}\n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  alert(sabrina.hit()); //Hit
-  alert(darkLord.hit()); //Heal
-  alert(
-    `Healthpoints:\n${sabrina.name}: ${sabrina.healthPoints}\n${
-      darkLord.name
-    }: ${darkLord.healthPoints}`
-  );
-  alert(
-    `Way to go ${
-      sabrina.name
-    }! You saved Greendale/Riverdale,\n you can finally be a real girl now and take Salem for long walks in the park with Harvey and the gang!`
-  );
-  sabrina.healthPoints = 5;
-  darkLord.healthPoints = 5;
-  return;
-}
-
-document.getElementById("dark").onclick = function() {
-  if (
-    confirm(
-      "Do you want to load live as pop-ups? Cancel will just display in console."
-    )
-  ) {
-    alertloop();
-  } else {
-    darkloop();
-  }
-  let par = document.createElement("LI");
-  document.getElementById("roundResults").appendChild(par).innerHTML = `The ${darkLord.name} was defeated.`;
 };
+
+
