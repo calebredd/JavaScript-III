@@ -41,11 +41,10 @@ function NewPerson(name) {
   this.name = name;
   this.weight = Math.floor(Math.random() * 500);
   this.intro = function() {
-    return console.log(
-      `Hello, my name is ${this.name}, I am ${this.age} years old and I am ${
+    return `Hello, my name is ${this.name}, I am ${this.age} years old and I am ${
         this.weight
       } lbs.\nWould you like to dance?`
-    );
+    ;
   };
   return;
 }
@@ -76,10 +75,10 @@ const thingsYouEnjoy = [
 ];
 
 function tellUsAboutYourself(thing1,thing2,thing3) {
-  return console.log(`Hi! My name is ${this.name}, I live in ${
+  return `Hi! My name is ${this.name}, I live in ${
     this.hometown
   }, and I enjoy ${thing1}, ${thing2}, and ${thing3}. I love to eat ${
     this.favoriteFood
-  } but I am allergic to ${this.allergies}.`);
+  } but I am allergic to ${this.allergies}.`;
 }
 tellUsAboutYourself.call(yourObject, thingsYouEnjoy[2], thingsYouEnjoy[3], thingsYouEnjoy[0]);

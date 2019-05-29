@@ -21,7 +21,7 @@ function GameObject(attributes) {
   this.dimensions = attributes.dimensions;
   this.destroy = function() {
     alert(`${this.name} was removed from the game`);
-    return console.log(`${this.name} was removed from the game`);
+    return `${this.name} was removed from the game`;
   };
 }
 
@@ -35,7 +35,7 @@ function CharacterStats(attributes) {
   GameObject.call(this, attributes);
   this.healthPoints = attributes.healthPoints;
   this.takeDamage = function() {
-    return console.log(`${this.name} took damage`);
+    return `${this.name} took damage`;
   };
 }
 /*
@@ -53,7 +53,7 @@ function Humanoid(attributes) {
   this.weapons = attributes.weapons;
   this.language = attributes.language;
   this.greet = function() {
-    return console.log(`${this.name} offers a greeting in ${this.language}`);
+    return `${this.name} offers a greeting in ${this.language}`;
   };
 }
 /*
@@ -126,9 +126,7 @@ function Hero(attributes) {
     document.getElementById("roundResults").appendChild(node).innerHTML = `${
       this.name
     } was hit`;
-    console.log(`${
-      this.name
-      } was hit`);
+    return `${this.name} was hit`;
     if (this.healthPoints <= 0) {
       return this.destroy();
     }
@@ -347,5 +345,7 @@ document.getElementById("dark").onclick = function() {
     darkloop();
   }
   let par = document.createElement("LI");
-  document.getElementById("roundResults").appendChild(par).innerHTML = `The ${darkLord.name} was defeated.`;
+  document.getElementById("roundResults").appendChild(par).innerHTML = `The ${
+    darkLord.name
+  } was defeated.`;
 };
