@@ -20,7 +20,7 @@ function GameObject(attributes) {
   this.name = attributes.name;
   this.dimensions = attributes.dimensions;
   this.destroy = function() {
-    return console.log(`${this.name} was removed from the game`);
+    return `${this.name} was removed from the game`;
   };
 }
 
@@ -34,7 +34,7 @@ function CharacterStats(attributes) {
   GameObject.call(this, attributes);
   this.healthPoints = attributes.healthPoints;
   this.takeDamage = function() {
-    return console.log(`${this.name} took damage`);
+    return `${this.name} took damage`;
   };
 }
 /*
@@ -52,11 +52,22 @@ function Humanoid(attributes) {
   this.weapons = attributes.weapons;
   this.language = attributes.language;
   this.race = attributes.race;
-  this.defense=attributes.defense;
-  this.attack=attributes.attack;
-  this.block=attributes.defense;
+  this.defense = attributes.defense;
+  this.attack = attributes.attack;
+  this.strike = function(target) {
+    let x = target.block - this.attack;
+    if (x < 0) {
+      target.healthPoints += x;
+      if (target.healthPoints < 0) {
+        return target.destroy();
+      } else {
+        return target.takeDamage();
+      }
+    }
+  };
+  this.block = attributes.defense;
   this.greet = function() {
-    return console.log(`${this.name} offers a greeting in ${this.language}`);
+    return `${this.name} offers a greeting in ${this.language}`;
   };
 }
 
@@ -93,8 +104,8 @@ const axeman = new Hero({
   weapons: ["Axe of Dragon Bone"],
   language: "Dwarvish",
   race: "dwarf",
-  attack:4,
-  defense:1,
+  attack: 4,
+  defense: 1,
   specialDescription: "jump up and slam his axe down in a splitting force",
   special: function(target) {
     console.log(
@@ -102,7 +113,7 @@ const axeman = new Hero({
         axeman.weapons
       } crashing down onto ${target.name} causing critical damage`
     );
-    return target.healthPoints-=axeman.attack;
+    return (target.healthPoints -= axeman.attack);
   }
 });
 const swordsman = new Hero({
@@ -127,8 +138,8 @@ const swordsman = new Hero({
         target.name
       } for the next round`
     );
-    swordsman.attack+=3;
-    swordsman.defense=10;
+    swordsman.attack += 3;
+    swordsman.defense = 10;
   }
 });
 
@@ -156,7 +167,7 @@ const archer = new Hero({
       } with three arrows at once and is immobolized for the next round`
     );
     target.block = 0;
-    target.will=0;
+    target.will = 0;
   }
 });
 const orc = new Villain({
@@ -176,7 +187,11 @@ const orc = new Villain({
   race: "orc",
   master: "Sarumon"
 });
-const health = `HEALTH:\n${axeman.name}:${axeman.healthPoints}, ${swordsman.name}:${swordsman.healthPoints}, ${archer.name}:${archer.healthPoints}\n${orc.name}:${orc.healthPoints}`;
+const health = `HEALTH:\n${axeman.name}:${axeman.healthPoints}, ${
+  swordsman.name
+}:${swordsman.healthPoints}, ${archer.name}:${archer.healthPoints}\n${
+  orc.name
+}:${orc.healthPoints}`;
 
 console.log(
   `${axeman.name} is a ${axeman.race} from ${axeman.team} who speaks ${
@@ -204,10 +219,20 @@ console.log(
     orc.language
   }, serves ${orc.master} and wields ${orc.weapons}`
 );
-console.log(health);
+//console.log(health);
 
-mainloop=function(){
+warriorArray = [orc, axeman, swordsman, archer];
 
+mainloop = function() {
+  let warriors = warriorArray.filter(warrior => warrior.healthPoints > 0);
+  console.log(health);
+  warriors.forEach(function(e){
+    if(e==="orc"){
+      e.strike('axeman');
+    }else{e.strike('orc');}
+    console.log(e);
+  });
+  console.log(health);
+  return warriors.map(warrior=>warrior.name+" "+warrior.healthPoints);
 };
-
-
+console.log(mainloop());
