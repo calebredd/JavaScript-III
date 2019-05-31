@@ -15,13 +15,15 @@
   * dimensions (These represent the character's size in the video game)
   * destroy() // prototype method that returns: `${this.name} was removed from the game.`
 */
-function GameObject(attributes) {
-  this.createdAt = attributes.createdAt;
-  this.name = attributes.name;
-  this.dimensions = attributes.dimensions;
-  this.destroy = function() {
+class GameObject {
+  constructor(attributes) {
+    this.createdAt = attributes.createdAt;
+    this.name = attributes.name;
+    this.dimensions = attributes.dimensions;
+  }
+  destroy() {
     return `${this.name} was removed from the game`;
-  };
+  }
 }
 
 /*
@@ -30,12 +32,14 @@ function GameObject(attributes) {
   * takeDamage() // prototype method -> returns the string '<object name> took damage.'
   * should inherit destroy() from GameObject's prototype
 */
-function CharacterStats(attributes) {
-  GameObject.call(this, attributes);
-  this.healthPoints = attributes.healthPoints;
-  this.takeDamage = function() {
-    return `${this.name} took damage`;
-  };
+class CharacterStats extends GameObject {
+  constructor(attributes) {
+    super(attributes);
+    this.healthPoints = attributes.healthPoints;
+  }
+  takeDamage(attacker) {
+    return `${this.name} took damage from ${attacker.name}!`;
+  }
 }
 /*
   === Humanoid (Having an appearance or character resembling that of a human.) ===
@@ -46,42 +50,62 @@ function CharacterStats(attributes) {
   * should inherit destroy() from GameObject through CharacterStats
   * should inherit takeDamage() from CharacterStats
 */
-function Humanoid(attributes) {
-  CharacterStats.call(this, attributes);
-  this.team = attributes.team;
-  this.weapons = attributes.weapons;
-  this.language = attributes.language;
-  this.race = attributes.race;
-  this.defense = attributes.defense;
-  this.attack = attributes.attack;
-  this.strike = function(target) {
-    let x = target.block - this.attack;
-    if (x < 0) {
-      target.healthPoints += x;
-      if (target.healthPoints < 0) {
+class Humanoid extends CharacterStats {
+  constructor(attributes) {
+    super(attributes);
+    this.team = attributes.team;
+    this.weapons = attributes.weapons;
+    this.language = attributes.language;
+    this.race = attributes.race;
+    this.defense = attributes.defense;
+    this.attack = attributes.attack;
+    this.block = attributes.defense;
+  }
+  strike(target) {
+    let defend = Math.round(Math.random());
+    let block = defend * target.block;
+    let damage = block - this.attack;
+    let counter = Math.round(Math.random());
+    if (damage < 0) {
+      target.healthPoints += damage;
+      if (target.healthPoints <= 0) {
         return target.destroy();
       } else {
-        return target.takeDamage();
+        return target.takeDamage(this);
+      }
+    } else {
+      if (counter) {
+        console.log(`${target.name} countered an attack from ${this.name},`);
+        this.healthPoints -= target.attack;
+        if (this.healthPoints <= 0) {
+          console.log(this.destroy());
+        }
+        return this.takeDamage(target);
+      } else {
+        return `${target.name} blocked an attack from ${this.name}!`;
       }
     }
-  };
-  this.block = attributes.defense;
-  this.greet = function() {
+  }
+  greet() {
     return `${this.name} offers a greeting in ${this.language}`;
-  };
+  }
 }
 
-function Hero(attributes) {
-  Humanoid.call(this, attributes);
-  this.special = attributes.special;
-  this.specialDescription = attributes.specialDescription;
-  this.will = 1;
+class Hero extends Humanoid {
+  constructor(attributes) {
+    super(attributes);
+    this.special = attributes.special;
+    this.specialDescription = attributes.specialDescription;
+    this.will = 1;
+  }
 }
 
-function Villain(attributes) {
-  Humanoid.call(this, attributes);
-  this.master = attributes.master;
-  this.will = 3;
+class Villain extends Humanoid {
+  constructor(attributes) {
+    super(attributes);
+    this.master = attributes.master;
+    this.will = 3;
+  }
 }
 /*
  * Inheritance chain: GameObject -> CharacterStats -> Humanoid
@@ -187,11 +211,32 @@ const orc = new Villain({
   race: "orc",
   master: "Sarumon"
 });
-const health = `HEALTH:\n${axeman.name}:${axeman.healthPoints}, ${
-  swordsman.name
-}:${swordsman.healthPoints}, ${archer.name}:${archer.healthPoints}\n${
-  orc.name
-}:${orc.healthPoints}`;
+const health = function() {
+  return `HEALTH:\n${axeman.name}:${axeman.healthPoints}, ${swordsman.name}:${
+    swordsman.healthPoints
+  }, ${archer.name}:${archer.healthPoints}\n${orc.name}:${orc.healthPoints}`;
+};
+let charDescribe = function(char) {
+  return `${char.name} is a ${char.race} from ${char.team} who speaks ${
+    char.language
+  }, has a special ability to ${char.specialDescription} and wields ${
+    char.weapons
+  }`;
+};
+var paragraph = document.createElement("p");
+
+document
+  .getElementById("gameDescription")
+  .appendChild(paragraph).innerHTML += charDescribe(axeman);
+document
+  .getElementById("gameDescription")
+  .appendChild(paragraph).innerHTML += charDescribe(swordsman);
+document
+  .getElementById("gameDescription")
+  .appendChild(paragraph).innerHTML += charDescribe(archer);
+document
+  .getElementById("gameDescription")
+  .appendChild(paragraph).innerHTML += charDescribe(orc);
 
 console.log(
   `${axeman.name} is a ${axeman.race} from ${axeman.team} who speaks ${
@@ -207,6 +252,7 @@ console.log(
     swordsman.weapons
   }`
 );
+
 console.log(
   `${archer.name} is an ${archer.race} from ${archer.team} who speaks ${
     archer.language
@@ -225,14 +271,37 @@ warriorArray = [orc, axeman, swordsman, archer];
 
 mainloop = function() {
   let warriors = warriorArray.filter(warrior => warrior.healthPoints > 0);
-  console.log(health);
-  warriors.forEach(function(e){
-    if(e==="orc"){
-      e.strike('axeman');
-    }else{e.strike('orc');}
-    console.log(e);
-  });
-  console.log(health);
-  return warriors.map(warrior=>warrior.name+" "+warrior.healthPoints);
+  console.log(health());
+  while (warriors.length > 1 && orc.healthPoints > 0) {
+    warriors = warriorArray.filter(warrior => warrior.healthPoints > 0);
+    warriors.forEach(function(e) {
+      if (e === orc) {
+        let y = Math.floor(Math.random() * 3);
+        if (y === 0) {
+          console.log(e.strike(axeman));
+        } else if (y === 1) {
+          console.log(e.strike(swordsman));
+        } else {
+          console.log(e.strike(archer));
+        }
+      } else {
+        if (orc.healthPoints > 0) {
+          console.log(e.strike(orc));
+        } else {
+          orc.destroy();
+        }
+      }
+    });
+    if (orc.healthPoints < 0) {
+      orc.healthPoints = 0;
+    }
+    console.log(health());
+  }
+  warriors = warriorArray.filter(warrior => warrior.healthPoints > 0);
+  console.log(
+    `The survivors from the Great Battle for Middle Earth were ${warriors.map(
+      survivor => survivor.name
+    )}`
+  );
 };
-console.log(mainloop());
+document.getElementById("dark").onclick = mainloop;
